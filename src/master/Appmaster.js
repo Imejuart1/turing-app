@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import BluetoothSyncAPIService from './services/bluetooth-sync-api.service';
+import BluetoothSyncAPIService from '../services/bluetooth-sync-api.service';
+import UserContactListComponent from '../Contactlist/UserContactListComponent';
 
-const App = () => {
+const Appmaster = () => {
   const [contactList, setContactList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [currentPageList, setCurrentPageList] = useState([]);
@@ -26,10 +27,13 @@ const App = () => {
 
     if (retryCount === 2) {
       // Hint: Set error message and ensure API call is not triggered.
+      setError('Failed to sync data');
+      
     }
 
     if (retryCount !== 0 && retryCount < 3) {
       // Hint: Call BluetoothSyncAPI service for 3 tries
+      sync()
     }
   }, [filteredList, offset, count, retryCount]);
 
@@ -74,6 +78,8 @@ const App = () => {
 
   const sync = async () => {
     setIsSyncing(true);
+
+    while (retryCount < 3) {
     try {
       const user = await BluetoothSyncAPIService.sync();
       const filterUser = user?.results.map((r) => ({
@@ -87,19 +93,33 @@ const App = () => {
       setContactList([...filterUser]);
       setFilteredList([...filterUser]);
       setOffset(0);
+      //setRetryCount(0);
+
+      break;
     } catch (err) {
+      setRetryCount(retryCount + 1);
       // Hint: Catch the error, and implement logic to retry 3 times.
     } finally {
       setIsSyncing(false); //set isSyncing to false
     }
+  }
+
+  if (retryCount === 3) {
+    setError('Failed to sync data');
+  }
     updatePropertyState(); //update property state after all other operations have been completed
   };
 
   return (
     <div>
+    <button onClick={sync} disabled={isSyncing}>
+        {isSyncing ? 'Syncing...' : 'Sync'}
+      </button>
       {/* Your JSX/HTML content here */}
+      hi : {error} / {retryCount}
+      <UserContactListComponent contactList={contactList} listId={listId} />
     </div>
   );
 };
 
-export default App;
+export default Appmaster;

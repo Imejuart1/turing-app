@@ -1,12 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
 import RandomUserList from './Aandom';
-import SyncButtonComponent from './SyncButtonComponent';
+import Appmaster from './master/Appmaster';
 
 function App() {
   return (
     <div className="App">
-    <SyncButtonComponent />
+    <Appmaster />
     </div>
   );
 }

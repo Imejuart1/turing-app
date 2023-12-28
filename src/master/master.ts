@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BluetoothSyncAPIService } from './services/bluetooth-sync-api.service';
+import { BluetoothSyncAPIService } from '../services/bluetooth-sync-api.service';
 
 @Component({
   selector: 'app-root',
