@@ -78,6 +78,7 @@ const Appmaster = () => {
 
   const sync = async () => {
     setIsSyncing(true);
+    setError(' ');
 
     while (retryCount < 3) {
     try {
@@ -116,7 +117,7 @@ const Appmaster = () => {
         {isSyncing ? 'Syncing...' : 'Sync'}
       </button>
       {/* Your JSX/HTML content here */}
-      hi : {error} / {retryCount}
+      {/*hi : {error} / {retryCount}*/}
       <UserContactListComponent contactList={contactList} listId={listId} />
     </div>
   );
