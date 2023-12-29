@@ -25,7 +25,7 @@ const UserContactListComponent = ({ contactList, listId }) => (
       //if (true){
       if (validatedName && validatedPhone && validatedPicture) {
         return (
-          <div key={index} id={`contactInfo_${listId}_${index}`} className="contactInfoWrapper">
+          <div key={index} id={`contactInfo_${listId}_${contact.id}`} className="contactInfoWrapper">
             <div className="contactInfoDescriptionWrapper">
               <div className="contactInfoThumbnail">
                 <img src={validatedPicture} alt={`Thumbnail for ${validatedName}`} />

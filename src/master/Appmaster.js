@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import BluetoothSyncAPIService from '../services/bluetooth-sync-api.service';
 import UserContactListComponent from '../Contactlist/UserContactListComponent';
+import PaginationControls from '../Pagination/Pagination';
 
 const Appmaster = () => {
   const [contactList, setContactList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [currentPageList, setCurrentPageList] = useState([]);
-  //const [newList, setNewList] = useState([]);
   const [offset, setOffset] = useState(0);
   const [count, setCount] = useState(5);
   const [page, setPage] = useState(0);
@@ -20,19 +20,7 @@ const Appmaster = () => {
   const listId = 'page';
   const [filterTerm, setFilterTerm] = useState('');
 
-  const validateName = (name) => {
-    return name ? name.slice(0, 20) : null;
-  };
-  
-  const validatePhone = (phone) => {
-    const isValidPhone = phone && phone.length >= 8 && phone.length <= 14 && /^\d+$/.test(phone);
-    return isValidPhone ? phone : null;
-  };
-  
-  const validatePicture = (picture) => {
-    // Assuming a simple validation for HTTP URL, you might want to enhance it
-    return picture && /^http/.test(picture) ? picture : null;
-  };
+
   useEffect(() => {
     // ComponentDidMount logic
     setTotal(filteredList.length);
@@ -40,27 +28,19 @@ const Appmaster = () => {
     setIsLastPage(offset + count >= filteredList.length);
     setIsFirstPage(offset < count);
 
-    const validContacts = filteredList.filter((contact) => {
-      const validatedName = validateName(contact.name);
-      const validatedPhone = validatePhone(contact.phone);
-      const validatedPicture = validatePicture(contact.thumbnail);
-
-      return validatedName && validatedPhone && validatedPicture;
-    });
-
-    setFilteredList(validContacts)
-
-    if (retryCount === 2) {
-      // Hint: Set error message and ensure API call is not triggered.
-      setError('Failed to sync data');
-      
-    }
-
     if (retryCount !== 0 && retryCount < 3) {
       // Hint: Call BluetoothSyncAPI service for 3 tries
-      sync()
+      sync();
     }
-  }, [filteredList, offset, count, retryCount]);
+
+    if (retryCount === 3) {
+     // Hint: Set error message and ensure API call is not triggered.
+      setError('Failed to sync data');
+      setRetryCount(0);
+    }
+
+
+  }, [filteredList, offset, count, retryCount]);/*filteredList, offset, count, retryCount*/
 
   const updatePropertyState = () => {
     const newPage =
@@ -112,8 +92,8 @@ const Appmaster = () => {
   const sync = async () => {
     setIsSyncing(true);
     setError(' ');
-
-    while (retryCount < 3) {
+   
+  
     try {
       const user = await BluetoothSyncAPIService.sync();
       const filterUser = user?.results.map((r) => ({
@@ -127,20 +107,20 @@ const Appmaster = () => {
       setContactList([...filterUser]);
       setFilteredList([...filterUser]);
       setOffset(0);
-      //setRetryCount(0);
 
-      break;
     } catch (err) {
-      setRetryCount(retryCount + 1);
       // Hint: Catch the error, and implement logic to retry 3 times.
+      if (retryCount < 2) {
+        setRetryCount(retryCount + 1);
+     
+      } else {
+        setRetryCount(3);
+      }
+      
     } finally {
       setIsSyncing(false); //set isSyncing to false
+      
     }
-  }
-
-  if (retryCount === 3) {
-    setError('Failed to sync data');
-  }
     updatePropertyState(); //update property state after all other operations have been completed
   };
 
@@ -159,23 +139,47 @@ const Appmaster = () => {
     <button onClick={sync} disabled={isSyncing}>
         {isSyncing ? 'Syncing...' : 'Sync'}
       </button>
-      {/* Your JSX/HTML content here hi : {error} / {retryCount}*/}
-      
+      {/* Your JSX/HTML content here */}
+      <div> hi : {error} / {retryCount} </div>
       <UserContactListComponent contactList={currentPageList} listId={listId} />
 
-      <div>
-      <span>
-          Page {page} of {totalPages} 
-        </span>
-        <button onClick={prevPage} disabled={isFirstPage}>
-          Previous
-        </button>
-        <button onClick={nextPage} disabled={isLastPage}>
-          Next
-        </button>
-      </div>
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        prevPage={prevPage}
+        nextPage={nextPage}
+        isFirstPage={isFirstPage}
+        isLastPage={isLastPage}
+      />
     </div>
   );
 };
 
 export default Appmaster;
+
+
+  /*const validateName = (name) => {
+    return name ? name.slice(0, 20) : null;
+  };
+  
+  const validatePhone = (phone) => {
+    const isValidPhone = phone && phone.length >= 8 && phone.length <= 14 && /^\d+$/.test(phone);
+    return isValidPhone ? phone : null;
+  };
+  
+  const validatePicture = (picture) => {
+    // Assuming a simple validation for HTTP URL, you might want to enhance it
+    return picture && /^http/.test(picture) ? picture : null;
+  };
+
+ useEffect(() => {
+    const validContacts = filteredList.filter((contact) => {
+      const validatedName = validateName(contact.name);
+      const validatedPhone = validatePhone(contact.phone);
+      const validatedPicture = validatePicture(contact.thumbnail);
+
+      return validatedName && validatedPhone && validatedPicture;
+    });
+
+    setFilteredList(validContacts);
+  }, [filteredList]);*/
