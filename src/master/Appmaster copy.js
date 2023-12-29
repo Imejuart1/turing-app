@@ -141,9 +141,8 @@ const Appmaster = () => {
       </button>
       {/* Your JSX/HTML content here */}
       <div> hi : {error} / {retryCount} </div>
-      <div> offset : {offset}</div>
       <UserContactListComponent contactList={currentPageList} listId={listId} />
-    
+
       <PaginationControls
         page={page}
         totalPages={totalPages}
@@ -159,3 +158,28 @@ const Appmaster = () => {
 export default Appmaster;
 
 
+  /*const validateName = (name) => {
+    return name ? name.slice(0, 20) : null;
+  };
+  
+  const validatePhone = (phone) => {
+    const isValidPhone = phone && phone.length >= 8 && phone.length <= 14 && /^\d+$/.test(phone);
+    return isValidPhone ? phone : null;
+  };
+  
+  const validatePicture = (picture) => {
+    // Assuming a simple validation for HTTP URL, you might want to enhance it
+    return picture && /^http/.test(picture) ? picture : null;
+  };
+
+ useEffect(() => {
+    const validContacts = filteredList.filter((contact) => {
+      const validatedName = validateName(contact.name);
+      const validatedPhone = validatePhone(contact.phone);
+      const validatedPicture = validatePicture(contact.thumbnail);
+
+      return validatedName && validatedPhone && validatedPicture;
+    });
+
+    setFilteredList(validContacts);
+  }, [filteredList]);*/

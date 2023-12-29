@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const BluetoothSyncAPIService = {
   
-  BLUETOOTH_SYNC_API : 'https://randomuser.me/api/?results=1000',
+  BLUETOOTH_SYNC_API : 'https://randomuser.me/api/?results=100',
 
     sync : async() => {    
       console.log("hi there")
