@@ -37,7 +37,7 @@ const PaginationControls = ({ page, totalPages, prevPage, nextPage, isFirstPage,
     }
     return pageNumbers;
   };*/
-  }
+  
 return (
   <div>
     <span>
