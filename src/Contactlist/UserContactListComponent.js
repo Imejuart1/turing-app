@@ -22,6 +22,7 @@ const UserContactListComponent = ({ contactList, listId }) => (
       const validatedPicture = validatePicture(contact.thumbnail);
 
       // Display the contact only if all validations pass
+      //if (true){
       if (validatedName && validatedPhone && validatedPicture) {
         return (
           <div key={index} id={`contactInfo_${listId}_${index}`} className="contactInfoWrapper">

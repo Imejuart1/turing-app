@@ -6,6 +6,7 @@ const Appmaster = () => {
   const [contactList, setContactList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [currentPageList, setCurrentPageList] = useState([]);
+  //const [newList, setNewList] = useState([]);
   const [offset, setOffset] = useState(0);
   const [count, setCount] = useState(5);
   const [page, setPage] = useState(0);
@@ -17,13 +18,37 @@ const Appmaster = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [error, setError] = useState('');
   const listId = 'page';
+  const [filterTerm, setFilterTerm] = useState('');
 
+  const validateName = (name) => {
+    return name ? name.slice(0, 20) : null;
+  };
+  
+  const validatePhone = (phone) => {
+    const isValidPhone = phone && phone.length >= 8 && phone.length <= 14 && /^\d+$/.test(phone);
+    return isValidPhone ? phone : null;
+  };
+  
+  const validatePicture = (picture) => {
+    // Assuming a simple validation for HTTP URL, you might want to enhance it
+    return picture && /^http/.test(picture) ? picture : null;
+  };
   useEffect(() => {
     // ComponentDidMount logic
     setTotal(filteredList.length);
-
+    updatePropertyState();
     setIsLastPage(offset + count >= filteredList.length);
     setIsFirstPage(offset < count);
+
+    const validContacts = filteredList.filter((contact) => {
+      const validatedName = validateName(contact.name);
+      const validatedPhone = validatePhone(contact.phone);
+      const validatedPicture = validatePicture(contact.thumbnail);
+
+      return validatedName && validatedPhone && validatedPicture;
+    });
+
+    setFilteredList(validContacts)
 
     if (retryCount === 2) {
       // Hint: Set error message and ensure API call is not triggered.
@@ -41,18 +66,19 @@ const Appmaster = () => {
     const newPage =
       offset > 0 ? Math.floor(offset / count) + 1 : filteredList.length > 0 ? 1 : 0;
 
+      setPage(newPage);
     setTotalPages(filteredList.length > 0 ? Math.ceil(filteredList.length / count) : 0);
     setTotal(filteredList.length);
     setCurrentPageList(filteredList.slice(offset, offset + count));
     setIsLastPage(offset + count >= filteredList.length);
     setIsFirstPage(offset < count);
-    setPage(newPage);
   };
 
   const nextPage = () => {
     if (offset + count < contactList.length) {
       // Hint: update the offset to go to next page
       setOffset(offset + count);
+      updatePropertyState();
     }
   };
 
@@ -60,6 +86,7 @@ const Appmaster = () => {
     if (offset - count >= 0) {
       // Hint: update the offset to go to previous page
       setOffset(offset - count);
+      updatePropertyState();
     }
   };
 
@@ -70,8 +97,14 @@ const Appmaster = () => {
       setOffset(0);
     } else {
       // filter the list and update data & offset accordingly
-      const newList = contactList;
-      // Apply your filter logic here
+      const newList = contactList.filter((contact) => {
+        return (
+          contact.name.toLowerCase().includes(term.target.value.toLowerCase()) ||
+          contact.email.toLowerCase().includes(term.target.value.toLowerCase())
+        );
+      });
+      setFilteredList(newList);
+    setOffset(0);
     }
     updatePropertyState();
   };
@@ -113,12 +146,34 @@ const Appmaster = () => {
 
   return (
     <div>
+          <label htmlFor="filterInput">Filter: </label>
+      <input
+        type="text"
+        id="filterInput"
+        value={filterTerm}
+        onChange={(e) => {
+          setFilterTerm(e.target.value);
+          onFilter(e);
+        }}
+      />
     <button onClick={sync} disabled={isSyncing}>
         {isSyncing ? 'Syncing...' : 'Sync'}
       </button>
-      {/* Your JSX/HTML content here */}
-      {/*hi : {error} / {retryCount}*/}
-      <UserContactListComponent contactList={contactList} listId={listId} />
+      {/* Your JSX/HTML content here hi : {error} / {retryCount}*/}
+      
+      <UserContactListComponent contactList={currentPageList} listId={listId} />
+
+      <div>
+      <span>
+          Page {page} of {totalPages} 
+        </span>
+        <button onClick={prevPage} disabled={isFirstPage}>
+          Previous
+        </button>
+        <button onClick={nextPage} disabled={isLastPage}>
+          Next
+        </button>
+      </div>
     </div>
   );
 };
