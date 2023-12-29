@@ -49,7 +49,7 @@ const Appmaster = () => {
       setPage(newPage);
     setTotalPages(filteredList.length > 0 ? Math.ceil(filteredList.length / count) : 0);
     setTotal(filteredList.length);
-    setCurrentPageList(filteredList.slice(offset, offset + count));
+    setCurrentPageList(filteredList.slice(offset, offset - count));
     setIsLastPage(offset + count >= filteredList.length);
     setIsFirstPage(offset < count);
   };
@@ -68,6 +68,12 @@ const Appmaster = () => {
       setOffset(offset - count);
       updatePropertyState();
     }
+  };
+
+  const goToPage = (pageNumber) => {
+    const newOffset = (pageNumber - 1) * count;
+    setOffset(newOffset);
+    updatePropertyState();
   };
 
   const onFilter = (term) => {
@@ -146,6 +152,7 @@ const Appmaster = () => {
     
       <PaginationControls
         page={page}
+        goToPage={goToPage}
         totalPages={totalPages}
         prevPage={prevPage}
         nextPage={nextPage}
